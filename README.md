@@ -8,7 +8,7 @@ Website: <https://madis.top>
 
 ## Download
 
-Official desktop packages are published through this repository's [GitHub Releases](https://github.com/MadisTop/madis-peek-3d/releases) and mirrored to [Gitee Releases](https://gitee.com/madis/madis-peek-3d/releases). During test distribution both repositories may remain private. Always use the package list actually shown on the selected Release page.
+Official desktop packages are published through this repository's [GitHub Releases](https://github.com/MadisTop/madis-peek-3d/releases) and mirrored to [Gitee Releases](https://gitee.com/madis/madis-peek-3d/releases). Use the package list shown on the selected Release page.
 
 Test builds are marked as **Pre-release**. When a Release contains `SHA256SUMS.txt`, verify the downloaded file before installation.
 
@@ -18,20 +18,20 @@ Test builds are marked as **Pre-release**. When a Release contains `SHA256SUMS.t
 - Decodes GLB meshes using `KHR_draco_mesh_compression`
 - Smooth orbit, pan, zoom, fit-to-view, native file picker, startup-file opening, and drag-and-drop workflows
 - A bilingual Simplified Chinese/English interface that follows the operating-system language by default and can be changed persistently from View → Language
-- A View menu that can hide or restore the toolbar, properties panel, and status bar, with local persistence
+- A View menu that can hide or restore the toolbar, properties panel, and status bar for the current session
 - Solid, opacity, wireframe, reference grid, coordinate axes, plus in-viewport 3D bounds and dimension lines
-- File name, full path, original file size, vertex count, triangle count, bounding dimensions, and on-demand render timing
+- File name, full path, original file size, vertex count, triangle count, bounding dimensions, and development-mode on-demand render timing
 - Coordinate-precision simplification with synchronized comparison views for the original mesh and 0–7 decimal places
 - Lightweight mesh editing: move and merge vertices, vertex/edge-midpoint/XYZ-axis snapping, face selection and deletion, degenerate-face cleanup, and single-step undo
 - Exports OBJ and binary STL, saves viewport screenshots, and provides a GLB export path that attempts Draco compression
-- Custom frameless desktop window whose application chrome follows the system light/dark theme, with independently selectable viewport backgrounds
+- Custom frameless desktop window with system, light, or dark application themes, with independently selectable viewport backgrounds
 - Normal updates can download silently in the background and install on exit; required updates can be checked and installed immediately, with the official download page kept as a fallback
 
 ## Format limitations
 
 Madis Peek 3D converts imported content into one editable triangular mesh. Multiple GLB meshes are flattened after applying node world transforms. Basic color is preserved where possible, but textures, detailed materials, animations, skinning, morph targets, cameras, lights, and the original scene hierarchy are not preserved as a lossless round trip.
 
-GLB export with Draco compression still requires continued runtime verification on each target platform. Do not rely on this application as the only copy of production assets; keep the original model files.
+GLB export depends on the Draco encoder and runtime environment. Encoding errors are reported rather than silently falling back to uncompressed GLB. Do not rely on this application as the only copy of production assets; keep the original model files.
 
 ## Shortcuts
 
@@ -50,20 +50,21 @@ GLB export with Draco compression still requires continued runtime verification 
 | `Delete` / `Backspace` | Delete the selected triangle in edit mode                       |
 | `Esc`                  | Close dialogs or cancel the current vertex drag                 |
 
-`Cmd` means the macOS Command key; Windows and Linux use `Ctrl`. Platform-specific matching is covered by unit tests, while real-keyboard regression remains part of per-platform package validation.
+`Cmd` means the macOS Command key; Windows and Linux use `Ctrl`.
 
-## Platform and trust status
+## Supported platforms
 
-The build configuration targets Windows x64, Linux x64, macOS Intel, and macOS Apple Silicon. Package types depend on the artifacts actually produced for each Release. Real installation and cross-version update flows still require end-to-end verification on all four targets.
+Targets include Windows x64, Linux x64, macOS Intel, and macOS Apple Silicon. Available versions and package formats are listed on the selected Release page.
 
-Tauri Updater artifacts and `latest.json` are protected with Minisign. This verifies updater payloads; it is not an operating-system code-signing identity.
+## Installation safety and privacy
 
-- Stable Linux Releases require native OpenPGP signatures on AppImage and RPM files and include the public key plus its full fingerprint. DEB files currently rely on SHA-256 and the updater Minisign signature rather than a separate native package signature. Test Releases may explicitly state that native Linux signing was skipped when signing secrets were unavailable.
-- Windows NSIS and MSI files in ordinary GitHub/Gitee Releases are not Authenticode-signed and may trigger unknown-publisher or SmartScreen warnings.
-- Microsoft Store distribution is a separate channel. An unsigned MSIX submission package is generated by a dedicated workflow and is never uploaded to ordinary Releases; after Partner Center review, the Store-delivered package is signed by Microsoft.
-- macOS packages currently use ad-hoc signing only. They do not carry a Developer ID identity and are not notarized by Apple.
+Choose an official package matching your operating system and processor architecture, read the version-specific notices, and verify `SHA256SUMS.txt` when supplied. A matching file name, successful download, or checksum alone does not establish the download source or signing identity.
 
-Review each Release's notes, `SHA256SUMS.txt`, and—when provided—the Linux signing key and fingerprint before installation.
+- Updater Minisign signatures verify update payloads. They are not Windows Authenticode, macOS Developer ID/notarization, or Linux package signatures, and do not guarantee that the operating system will show no security warnings.
+- If Windows reports an unknown publisher or SmartScreen warning, or macOS shows a security warning, check the download source and the signing identity displayed by the operating system. Do not globally disable system protection to install the application.
+- When a Linux release supplies an OpenPGP public key and full fingerprint, confirm the fingerprint through a trusted channel before verifying the signature. Verification methods for different package formats are not interchangeable.
+- For separate channels such as Microsoft Store, check the publisher identity and installation permissions shown by that store.
+- Keep original model copies and open only files from trusted sources. Remove local paths, personal information, and sensitive model content before reporting an issue; do not upload private models without authorization.
 
 ## Feedback
 
