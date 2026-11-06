@@ -69,3 +69,23 @@ Choose an official package matching your operating system and processor architec
 ## Feedback
 
 Report installation or usage problems through this repository's Issues page. Include the operating system, application version, model format, approximate vertex/triangle count, and reproducible steps. Do not attach private or proprietary 3D models unless you are authorized to share them.
+
+## Installation paths, user data, and portable mode
+
+New Windows NSIS and MSI installations default to `%LOCALAPPDATA%/Programs/Madis/Peek3D`. An existing valid installation directory containing the product executable takes precedence during upgrades. The application identifier remains `top.madis.peek3d`. Directory restoration applies within the same installer family. Direct MSI/NSIS cross-type installation is blocked: uninstall the previous type while preserving data before installing the other type. This is not a verified cross-type upgrade flow.
+
+Native installed-mode user-data roots:
+
+- Windows: `%LOCALAPPDATA%/Madis/Peek3D`.
+- macOS: `~/Library/Application Support/Madis/Peek3D`.
+- Linux: `Madis/Peek3D` under an absolute, valid `XDG_DATA_HOME`; otherwise `~/.local/share/Madis/Peek3D` (including when XDG_DATA_HOME is empty or relative).
+
+Within the root, `Data` contains persistent content, `State` contains durable state that must not be treated as disposable cache, `Cache` contains regenerable files, `WebView` stores the Windows/Linux browser profile including localStorage, and `Logs` is created on demand. On Windows, WebView2 creates the actual profile under `WebView/EBWebView` (including localStorage within its Default subdirectory). Trusted time, policy sequence, and verified policies belong in `State/version-policy`. Removing these files damages local rollback-protection history; this is not routine cache cleanup. macOS WKWebView profiles remain system-managed and are not redirected into this WebView directory; native Data/State use the product root above.
+
+Portable mode supports Windows/Linux only. Pass `--portable`, or manually create `portable.json` beside the actual executable with exactly `{"version":1}` (JSON whitespace is allowed; extra/duplicate fields and other versions are rejected). An existing invalid marker is an error, never a silent fallback. The flag does not create a marker. The portable root is the executable directory's `Data` folder, independent of the working directory. Linux AppImage uses the outer package specified by an absolute, existing `APPIMAGE` file as the anchor; the marker also belongs beside that outer package, never inside its temporary read-only mount. Persistent content lives directly there, alongside `State`, `Cache`, `WebView`, and on-demand `Logs`. The same canonical data root shares one instance; different roots do not forward files to one another. An unwritable directory fails startup rather than falling back to installed-mode data. macOS explicitly rejects the flag or a valid marker and does not write inside the .app bundle, preserving its signature.
+
+Portable mode retains signed-policy checks, trusted time, sequence rollback protection, and native capability gates, with official manual-download guidance. It never invokes the installer Updater and does not support automatic portable updates. Exit the app, manually download and replace the application, and preserve the entire Data directory; installer packages are not portable auto-update payloads.
+
+Uninstallation preserves user data by default. NSIS removes only the current product's `%LOCALAPPDATA%/Madis/Peek3D` after explicit selection and never during update removal. It never removes the user-data Madis parent, other products, or old-identifier data. MSI has no automatic user-data deletion option: exit, back up, and manually remove only the current product root if desired. The product's uninstall templates do not remove system-managed macOS WebKit data. There is no runtime old-ID compatibility or automatic migration, and deleting Cache does not delete State.
+
+Installation, upgrades, removal, and portable replacement depend on target-system permissions, runtimes, and signing mechanisms. Back up and check behavior in your environment; this directory contract is not a guarantee for every platform combination, code-signing identity, or updater flow.

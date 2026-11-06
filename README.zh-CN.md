@@ -69,3 +69,23 @@ GLB 导出依赖 Draco 编码器与运行环境；编码失败时会报告错误
 ## 问题反馈
 
 安装或使用过程中遇到问题，可以通过本仓库的 Issues 页面反馈。请提供操作系统、软件版本、模型格式、近似顶点/三角面数量和可复现步骤；未经授权请勿上传私有或未公开的三维模型。
+
+## 安装目录、用户数据与便携模式
+
+Windows NSIS 与 MSI 新装默认安装到 `%LOCALAPPDATA%\Programs\Madis\Peek3D`；升级时优先恢复仍含本产品程序的合法安装目录。应用 identifier 保持 `top.madis.peek3d`。同类型安装器支持恢复合法位置；不支持 MSI/NSIS 直接跨类型覆盖，切换前请先卸载原类型并保留数据，再安装新类型，不将此流程视为已验证的跨类型升级。
+
+安装模式的原生用户数据根目录：
+
+- Windows：`%LOCALAPPDATA%\Madis\Peek3D`。
+- macOS：`~/Library/Application Support/Madis/Peek3D`。
+- Linux：有效的绝对 `XDG_DATA_HOME` 下的 `Madis/Peek3D`；未设置、为空或为相对路径时使用 `~/.local/share/Madis/Peek3D`。
+
+根目录下，`Data` 为持久内容，`State` 为不可当作缓存随意清理的持久状态，`Cache` 为可再生缓存，`WebView` 为 Windows/Linux 浏览器 profile（包括 localStorage），`Logs` 按需创建。Windows WebView2 的实际 profile 子层是 `WebView/EBWebView`（例如 localStorage 在其 Default 子目录内）。可信时间、策略序号和已验签策略位于 `State/version-policy`；删除这些文件会损害本地防回退历史，不能当作日常“清缓存”。macOS 的 WKWebView profile 由系统管理，不会重定向到此 `WebView` 目录；原生 Data/State 仍使用上述产品根。
+
+便携模式仅支持 Windows/Linux：使用 `--portable`，或在实际可执行文件旁手动创建内容严格为 `{"version":1}` 的 `portable.json`（允许 JSON 空白，不允许额外/重复字段或其它版本）。已存在但无效的 marker 会报错，不回退安装模式；显式参数不会创建 marker。便携根固定为可执行文件目录内的 `Data`，持久内容直接放在此根内，其下使用 `State`、`Cache`、`WebView`、按需 `Logs`，与启动时的工作目录无关。Linux AppImage 使用有效绝对 `APPIMAGE` 指向的外层包目录作为锚点，marker 也放在外层包旁，不能放在临时只读挂载内。同一规范数据根共用单实例，不同数据根不会互相转发文件。目录不可写时启动失败，不回落到用户安装数据。macOS 遇到参数或有效 marker 会明确拒绝，不写入 .app 内部，以免破坏签名。
+
+便携版仍执行签名策略检查、可信时间、序号防回退和原生能力门禁，并提供官方下载提示；不调用安装型 Updater，不支持自动便携更新。更新时退出应用，手动下载并替换程序，保留整个 Data 目录；不要把安装包当作便携自动更新载荷。
+
+卸载默认保留用户数据。NSIS 仅在用户明确勾选删除数据且不是更新卸载时，删除当前产品的 `%LOCALAPPDATA%\Madis\Peek3D`；不删除用户数据的 Madis 父目录、其它产品或旧 identifier 数据。MSI 不提供自动删除用户数据选项；需要清理时先退出程序、备份，再由用户仅删除上述当前产品根目录。macOS 系统 WebKit 数据也不会被本产品卸载模板自动删除。运行时不识别旧 ID、不自动搬迁；清理 Cache 不会清除 State。
+
+安装、升级、卸载及便携替换受目标系统权限、运行库和签名机制影响。请先备份并在目标环境确认行为；目录契约不代表所有平台组合均获得安装、签名或自动更新保证。
